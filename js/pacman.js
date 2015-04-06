@@ -78,7 +78,7 @@ function moveRight(){
 }
 
 function moveDown(){
-	moveDownwards = canMoveDownwards(xPosition, yPosition);
+	moveDownwards = canMoveVertically(xPosition, yPosition, false);
 	
 	if(!moveDownwards){
 		return false;
@@ -143,7 +143,7 @@ function moveLeft(){
 
 function moveUp(){	
 
-	moveUpwards = canMoveUpwards(xPosition, yPosition);
+	moveUpwards = canMoveVertically(xPosition, yPosition,true);
 	
 	if(!moveUpwards){
 		return false;
@@ -155,7 +155,7 @@ function moveUp(){
 	ctx.fillStyle = "#f2f000"
 	ctx.strokeStyle="#000000"
 	
-	yPosition-=3;
+	yPosition-=2;
 	
 	// Arc of pacman
 	ctx.arc(xPosition,yPosition,20,Math.PI*1.75,Math.PI*1.25,false)
@@ -223,28 +223,41 @@ function drawBorders(){
 	ctx.stroke();
 }
 
-function canMoveDownwards(x, y){
+function canMoveVertically(x, y,isUpwards){
 
-	borders = [
+	downwards = [
 		{'xa': 80, 'ya': 80, 'xb': 180, 'yb': 80},
 		{'xa': 20, 'ya': 560, 'xb': 560, 'yb': 560},
 	]
-	
-	var nearest = true;
-	
+
+	upwards = [
+		{'xa': 20, 'ya': 20, 'xb': 240, 'yb': 20},
+		{'xa': 80, 'ya': 150, 'xb': 180, 'yb': 150},
+		{'xa': 240, 'ya': 100, 'xb': 280, 'yb': 100},
+		{'xa': 280, 'ya': 20, 'xb': 560, 'yb': 20}
+	]
+
+	borders = downwards.concat(upwards)
+	dy = 1
+	if(isUpwards)
+		dy = -1
+
 	for(var i=0; i<borders.length; i++){
 		current = borders[i];
-		
-		if(y+20 == current.ya - 4 || y+20 == current.ya - 5){
-			
-			if(x+20 >= current.xa - 3 && x-20 <= current.xb + 3){
+		console.log(current)
+		console.log(x + " "  + y)
+		if(y+20*dy == current.ya - dy*4 || y+20*dy == current.ya - dy*5){
+			console.log("crossed y")
+			if(x+20 >= current.xa && x-20 <= current.xb){
+				console.log("crossed x")
+				console.log(dy)
 				return false;
 			}
 				
 		}
 	}
 
-	return nearest;
+	return true;
 }
 
 function canMoveUpwards(x, y){
