@@ -1,9 +1,10 @@
 var xPosition = 49;
 var yPosition = 48;
-var ctx;
+var canvas, ctx;
 
 function init(){
-	ctx = document.getElementById('canvas').getContext('2d');
+	canvas = document.getElementById('canvas');
+	ctx = canvas.getContext('2d');
 	// drawDots();
 	drawBorders();
 
@@ -40,8 +41,9 @@ function keyDownEvent(){
 	event.preventDefault();
 }
 
-function clearPacman(){
-	ctx.clearRect(xPosition-22,yPosition-22,44,44);
+function reset(){
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	drawBorders();
 }
 
 function moveRight(){
@@ -53,7 +55,7 @@ function moveRight(){
 			return false;
 		}
 	}
-	clearPacman();
+	reset();
 
 	// Draw the Pacman
 	ctx.beginPath();
@@ -78,20 +80,22 @@ function moveRight(){
 }
 
 function moveDown(){
+	yPosition+=2;
 	moveDownwards = canMoveVertically(xPosition, yPosition, false);
 	
 	if(!moveDownwards){
+		yPosition-=2;
 		return false;
 	}
 
-	clearPacman();
+	reset();
 
 	// Draw the Pacman
 	ctx.beginPath();
 	ctx.fillStyle = "#f2f000"
 	ctx.strokeStyle="#000000"
 	
-	yPosition+=2;
+	
 	
 	// Arc of pacman
 	ctx.arc(xPosition,yPosition,20,Math.PI*0.75,Math.PI*0.25,false)
@@ -117,7 +121,7 @@ function moveLeft(){
 			return false;
 		}
 	}
-	clearPacman();
+	reset();
 
 	// Draw the Pacman
 	ctx.beginPath();
@@ -142,20 +146,21 @@ function moveLeft(){
 }
 
 function moveUp(){	
-
+	yPosition-=2;
 	moveUpwards = canMoveVertically(xPosition, yPosition,true);
 	
 	if(!moveUpwards){
+		yPosition+=2;
 		return false;
 	}
 
-	clearPacman();
+	reset();
 	// Draw the Pacman
 	ctx.beginPath();
 	ctx.fillStyle = "#f2f000"
 	ctx.strokeStyle="#000000"
 	
-	yPosition-=2;
+	
 	
 	// Arc of pacman
 	ctx.arc(xPosition,yPosition,20,Math.PI*1.75,Math.PI*1.25,false)
@@ -246,7 +251,7 @@ function canMoveVertically(x, y,isUpwards){
 		current = borders[i];
 		console.log(current)
 		console.log(x + " "  + y)
-		if(y+20*dy == current.ya - dy*4 || y+20*dy == current.ya - dy*5){
+		if(y+20*dy == current.ya || y+20*dy == current.ya - dy){
 			console.log("crossed y")
 			if(x+20 >= current.xa && x-20 <= current.xb){
 				console.log("crossed x")
