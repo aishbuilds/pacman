@@ -17,6 +17,7 @@ var pacmanX = 60;
 var pacmanY = 60;
 var pacmanRadius = 20;
 var isRight;
+var isDown;
 
 var GRID_WIDTH = 40;
 var GRID_HEIGHT = 40;
@@ -30,8 +31,8 @@ function init(){
 	initializeCanvas();
 
 	drawBorders();
-	
-	drawHorizontalPacman(true);
+
+	drawPacman(true);
 }
 
 function initializeGrid(){
@@ -123,12 +124,41 @@ function moveHorizontal(){
 	reset();
 	
 	pacmanX = pacmanX + (dx * 2)
-	drawHorizontalPacman(isRight);
+	drawPacman(true);
 
 	globalID = window.requestAnimationFrame(moveHorizontal);
 }
 
-function drawHorizontalPacman(isRight){
+function moveVertical(){
+	var xIndex = Math.floor(pacmanX/GRID_WIDTH);
+	var yIndex = Math.floor(pacmanY/GRID_HEIGHT);
+
+	if(isDown){
+		dy = 1
+		currentBlock = grid[yIndex][xIndex]
+		nextBlock = grid[yIndex+1][xIndex]
+	}
+	else{
+		dy = -1
+		currentBlock = grid[yIndex][xIndex]
+		nextBlock = grid[yIndex-1][xIndex]
+	}
+		
+
+	// Stop if a wall is encountered	
+	if((currentBlock != nextBlock) && ((pacmanY + (dy * pacmanRadius)) % GRID_WIDTH == 0)){
+		return false;
+	}
+
+	reset();
+	
+	pacmanY = pacmanY + (dy * 2)
+	drawPacman(false);
+
+	globalID = window.requestAnimationFrame(moveVertical);
+}
+
+function drawPacman(isHorizontal){
 	// Draw the Pacman
 	ctx.beginPath();
 	ctx.fillStyle = "#f2f000"
@@ -136,19 +166,39 @@ function drawHorizontalPacman(isRight){
 	
 	var startAngle, endAngle, dMouthX, dMouthY;
 
-	// MOVE RIGHT
-	if(isRight){
-		startAngle = Math.PI*0.25;
-		endAngle = Math.PI*1.75;
-		dMouthX = 2
-		dMouthY = 0
+	if(isHorizontal){
+		// MOVE RIGHT
+		if(isRight){
+			startAngle = Math.PI*0.25;
+			endAngle = Math.PI*1.75;
+			dMouthX = 2
+			dMouthY = 0
+		}
+		// MOVE LEFT
+		else{
+			startAngle = Math.PI*1.25;
+			endAngle = Math.PI*0.75;
+			dMouthX = 2
+			dMouthY = 0
+		}	
 	}
 	else{
-		startAngle = Math.PI*1.25;
-		endAngle = Math.PI*0.75;
-		dMouthX = 2
-		dMouthY = 0
+		// MOVE DOWN
+		if(isDown){
+			startAngle = Math.PI*0.75;
+			endAngle = Math.PI*0.25;
+			dMouthX = 0
+			dMouthY = 2
+		}
+		// MOVE UP
+		else{
+			startAngle = Math.PI*1.75;
+			endAngle = Math.PI*1.25;
+			dMouthX = 0
+			dMouthY = -2
+		}
 	}
+	
 
 	// Arc of pacman
 	ctx.arc(pacmanX,pacmanY,pacmanRadius,startAngle,endAngle,false)
@@ -159,10 +209,10 @@ function drawHorizontalPacman(isRight){
 	ctx.stroke();
 	
 	// eyes
-	ctx.beginPath();
-	ctx.fillStyle = "#000000"
-	ctx.arc(pacmanX+2,pacmanY-10,2,0,Math.PI*2, false)
-	ctx.fill();
+	// ctx.beginPath();
+	// ctx.fillStyle = "#000000"
+	// ctx.arc(pacmanX+2,pacmanY-10,2,0,Math.PI*2, false)
+	// ctx.fill();
 }
 
 window.addEventListener("keydown", keyDownEvent, true)
@@ -183,9 +233,11 @@ function keyDownEvent(){
 			isRight = false
 			moveHorizontal();
 			break;
-		// case 38:
-		// 	moveUp();
-		// 	break;
+		case 38:
+			cancelAnimationFrame(globalID);
+			isDown = false;
+			moveVertical();
+			break;
 		case 39:
 			cancelAnimationFrame(globalID);
 			isRight = true
@@ -193,7 +245,8 @@ function keyDownEvent(){
 			break;
 		case 40:
 			cancelAnimationFrame(globalID);
-			// moveDown();
+			isDown = true;
+			moveVertical();
 			break;
 	}
 	event.preventDefault();
