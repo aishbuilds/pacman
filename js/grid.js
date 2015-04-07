@@ -13,12 +13,15 @@ var userGrid = [
 	[1,1,1,1,1,1,1,1,1,1,0,1,1],
 ]
 
-var pacmanX = 80;
+var pacmanX = 60;
 var pacmanY = 60;
+var pacmanRadius = 20;
+var isRight;
 
 var GRID_WIDTH = 40;
 var GRID_HEIGHT = 40;
 var grid = [];
+var globalID;
 
 function init(){
 	
@@ -27,8 +30,8 @@ function init(){
 	initializeCanvas();
 
 	drawBorders();
-
-	drawPacman(39);
+	
+	drawHorizontalPacman(true);
 }
 
 function initializeGrid(){
@@ -84,10 +87,10 @@ function drawBorders(){
 				ctx.stroke();
 			}
 	
-			xPosition += 40
+			xPosition += GRID_WIDTH
 		}
 		xPosition = 0
-		yPosition += 40
+		yPosition += GRID_HEIGHT
 	}
 }
 
@@ -96,9 +99,36 @@ function reset(){
 	drawBorders();
 }
 
-function drawPacman(code){
+function moveHorizontal(){
+	var xIndex = Math.floor(pacmanX/GRID_WIDTH);
+	var yIndex = Math.floor(pacmanY/GRID_HEIGHT);
+
+	if(isRight){
+		dx = 1
+		currentBlock = grid[yIndex][xIndex]
+		nextBlock = grid[yIndex][xIndex+1]
+	}
+	else{
+		dx = -1
+		currentBlock = grid[yIndex][xIndex]
+		nextBlock = grid[yIndex][xIndex-1]
+	}
+		
+
+	// Stop if a wall is encountered	
+	if((currentBlock != nextBlock) && ((pacmanX + (dx * pacmanRadius)) % GRID_WIDTH == 0)){
+		return false;
+	}
+
 	reset();
 	
+	pacmanX = pacmanX + (dx * 2)
+	drawHorizontalPacman(isRight);
+
+	globalID = window.requestAnimationFrame(moveHorizontal);
+}
+
+function drawHorizontalPacman(isRight){
 	// Draw the Pacman
 	ctx.beginPath();
 	ctx.fillStyle = "#f2f000"
@@ -107,16 +137,21 @@ function drawPacman(code){
 	var startAngle, endAngle, dMouthX, dMouthY;
 
 	// MOVE RIGHT
-	if(code == 39){
+	if(isRight){
 		startAngle = Math.PI*0.25;
 		endAngle = Math.PI*1.75;
 		dMouthX = 2
 		dMouthY = 0
-		pacmanX += 2
+	}
+	else{
+		startAngle = Math.PI*1.25;
+		endAngle = Math.PI*0.75;
+		dMouthX = 2
+		dMouthY = 0
 	}
 
 	// Arc of pacman
-	ctx.arc(pacmanX,pacmanY,20,startAngle,endAngle,false)
+	ctx.arc(pacmanX,pacmanY,pacmanRadius,startAngle,endAngle,false)
 	// Mouth
 	ctx.lineTo(pacmanX+dMouthX,pacmanY+dMouthY)
 	
@@ -143,17 +178,22 @@ function keyDownEvent(){
 		code = event.charCode;
 
 	switch(code){
-		// case 37:
-		// 	moveLeft();
-		// 	break;
+		case 37:
+			cancelAnimationFrame(globalID);
+			isRight = false
+			moveHorizontal();
+			break;
 		// case 38:
 		// 	moveUp();
 		// 	break;
 		case 39:
-			drawPacman(39);
+			cancelAnimationFrame(globalID);
+			isRight = true
+			moveHorizontal();
 			break;
 		case 40:
-			moveDown();
+			cancelAnimationFrame(globalID);
+			// moveDown();
 			break;
 	}
 	event.preventDefault();
