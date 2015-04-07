@@ -1,0 +1,7 @@
+	console.log("-------")
+	console.log(pacmanX, pacmanY)
+	console.log(currentBlock)
+	console.log(nextBlock)
+	console.log(grid)
+	console.log(xIndex)
+	console.log(yIndex)

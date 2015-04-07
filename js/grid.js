@@ -1,22 +1,20 @@
 var canvas, ctx;
 var userGrid = [
-	[1,1,1,1,1,0,1,1,1,1,1,1,0],
-	[1,1,0,0,1,1,1,1,1,1,1,1,1],
-	[1,1,0,0,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,0,0,0,1,1,0,0,0],
-	[1,1,1,1,1,0,0,0,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,0,0,0,0,1,1,1,0,1,1],
-	[1,1,1,0,0,0,0,1,1,1,0,1,1],
-	[1,1,1,1,1,1,1,1,1,1,0,1,1],
+	[1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1],
+	[1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,0,0,1,0,1,1,0,0,0,1,1,0,1,0,0,1],
+	[1,1,1,1,0,0,1,1,0,1,1,0,0,1,1,1,1],
+	[1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1],
+	[1,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1],
+	[1,1,1,1,0,0,0,0,0,0,0,0,0,1,0,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ]
 
 var pacmanX = 60;
 var pacmanY = 60;
 var pacmanRadius = 20;
-var isRight;
+var isRight=true;
 var isDown;
 
 var GRID_WIDTH = 40;
@@ -108,11 +106,15 @@ function moveHorizontal(){
 		dx = 1
 		currentBlock = grid[yIndex][xIndex]
 		nextBlock = grid[yIndex][xIndex+1]
+		diagonalbelow = grid[yIndex + 1][xIndex + 1]
+		diagonalabove = grid[yIndex - 1][xIndex + 1]
 	}
 	else{
 		dx = -1
 		currentBlock = grid[yIndex][xIndex]
 		nextBlock = grid[yIndex][xIndex-1]
+		diagonalbelow = grid[yIndex + 1][xIndex - 1]
+		diagonalabove = grid[yIndex - 1][xIndex - 1]
 	}
 		
 
@@ -121,6 +123,13 @@ function moveHorizontal(){
 		return false;
 	}
 
+	cancelAnimationFrame(globalID);
+
+	if(currentBlock != diagonalbelow || currentBlock != diagonalabove){
+		diff = pacmanY % GRID_WIDTH
+		if(diff < 20 || diff > 20)
+			pacmanY = (pacmanY - (pacmanY % GRID_WIDTH)) + 20
+	}
 	reset();
 	
 	pacmanX = pacmanX + (dx * 2)
@@ -137,17 +146,28 @@ function moveVertical(){
 		dy = 1
 		currentBlock = grid[yIndex][xIndex]
 		nextBlock = grid[yIndex+1][xIndex]
+		diagonalLeft = grid[yIndex + 1][xIndex - 1]
+		diagonalRight = grid[yIndex + 1][xIndex + 1]
 	}
 	else{
 		dy = -1
 		currentBlock = grid[yIndex][xIndex]
 		nextBlock = grid[yIndex-1][xIndex]
+		diagonalLeft = grid[yIndex - 1][xIndex - 1]
+		diagonalRight = grid[yIndex - 1][xIndex + 1]
 	}
-		
 
+	
 	// Stop if a wall is encountered	
 	if((currentBlock != nextBlock) && ((pacmanY + (dy * pacmanRadius)) % GRID_WIDTH == 0)){
 		return false;
+	}
+
+	cancelAnimationFrame(globalID);
+	if((currentBlock != diagonalLeft || currentBlock != diagonalRight)){
+		diff = pacmanX % GRID_WIDTH
+		if(diff < 20 || diff > 20)
+			pacmanX = (pacmanX - (pacmanX % GRID_WIDTH)) + 20
 	}
 
 	reset();
@@ -235,24 +255,23 @@ function keyDownEvent(){
 
 	switch(code){
 		case 37:
-			cancelAnimationFrame(globalID);
 			isRight = false
 			moveHorizontal();
 			break;
 		case 38:
-			cancelAnimationFrame(globalID);
 			isDown = false;
 			moveVertical();
 			break;
 		case 39:
-			cancelAnimationFrame(globalID);
 			isRight = true
 			moveHorizontal();
 			break;
 		case 40:
-			cancelAnimationFrame(globalID);
 			isDown = true;
 			moveVertical();
+			break;
+		case 32:
+			cancelAnimationFrame(globalID);
 			break;
 	}
 	event.preventDefault();
