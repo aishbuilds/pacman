@@ -13,8 +13,6 @@ var userGrid = [
 	[1,1,1,1,1,1,1,1,1,1,0,1,1],
 ]
 
-var xPosition = 0;
-var yPosition = 0;
 var pacmanX = 80;
 var pacmanY = 60;
 
@@ -30,7 +28,7 @@ function init(){
 
 	drawBorders();
 
-	drawPacman();
+	drawPacman(39);
 }
 
 function initializeGrid(){
@@ -63,6 +61,9 @@ function initializeCanvas(){
 
 function drawBorders(){
 	ctx.strokeStyle = '#0033ff';
+	
+	var xPosition = 0;
+	var yPosition = 0;
 
 	for(var i=0; i<grid.length-1; i++){
 		for(var j=0; j<grid[i].length-1; j++){
@@ -90,18 +91,34 @@ function drawBorders(){
 	}
 }
 
-function drawPacman(){
+function reset(){
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	drawBorders();
+}
+
+function drawPacman(code){
+	reset();
+	
 	// Draw the Pacman
 	ctx.beginPath();
 	ctx.fillStyle = "#f2f000"
 	ctx.strokeStyle="#000000"
 	
-	
-	
+	var startAngle, endAngle, dMouthX, dMouthY;
+
+	// MOVE RIGHT
+	if(code == 39){
+		startAngle = Math.PI*0.25;
+		endAngle = Math.PI*1.75;
+		dMouthX = 2
+		dMouthY = 0
+		pacmanX += 2
+	}
+
 	// Arc of pacman
-	ctx.arc(pacmanX,pacmanY,20,Math.PI*0.25,Math.PI*1.75,false)
+	ctx.arc(pacmanX,pacmanY,20,startAngle,endAngle,false)
 	// Mouth
-	ctx.lineTo(pacmanX+2,pacmanY)
+	ctx.lineTo(pacmanX+dMouthX,pacmanY+dMouthY)
 	
 	ctx.fill();
 	ctx.stroke();
@@ -111,6 +128,35 @@ function drawPacman(){
 	ctx.fillStyle = "#000000"
 	ctx.arc(pacmanX+2,pacmanY-10,2,0,Math.PI*2, false)
 	ctx.fill();
+}
+
+window.addEventListener("keydown", keyDownEvent, true)
+
+function keyDownEvent(){
+	
+	if(!event)
+		event = window.event;
+
+	var code = event.keyCode;
+
+	if(event.charCode && code==0)
+		code = event.charCode;
+
+	switch(code){
+		// case 37:
+		// 	moveLeft();
+		// 	break;
+		// case 38:
+		// 	moveUp();
+		// 	break;
+		case 39:
+			drawPacman(39);
+			break;
+		case 40:
+			moveDown();
+			break;
+	}
+	event.preventDefault();
 }
 
 window.onload = init;
