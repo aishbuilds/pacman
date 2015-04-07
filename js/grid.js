@@ -167,6 +167,8 @@ function drawPacman(isHorizontal){
 	var startAngle, endAngle, dMouthX, dMouthY;
 
 	if(isHorizontal){
+		dEyesX = 2
+		dEyesY = -10
 		// MOVE RIGHT
 		if(isRight){
 			startAngle = Math.PI*0.25;
@@ -189,6 +191,8 @@ function drawPacman(isHorizontal){
 			endAngle = Math.PI*0.25;
 			dMouthX = 0
 			dMouthY = 2
+			dEyesX = -8
+			dEyesY = -2
 		}
 		// MOVE UP
 		else{
@@ -196,6 +200,8 @@ function drawPacman(isHorizontal){
 			endAngle = Math.PI*1.25;
 			dMouthX = 0
 			dMouthY = -2
+			dEyesX = 8
+			dEyesY = 2
 		}
 	}
 	
@@ -209,10 +215,10 @@ function drawPacman(isHorizontal){
 	ctx.stroke();
 	
 	// eyes
-	// ctx.beginPath();
-	// ctx.fillStyle = "#000000"
-	// ctx.arc(pacmanX+2,pacmanY-10,2,0,Math.PI*2, false)
-	// ctx.fill();
+	ctx.beginPath();
+	ctx.fillStyle = "#000000"
+	ctx.arc(pacmanX+dEyesX,pacmanY+dEyesY,2,0,Math.PI*2, false)
+	ctx.fill();
 }
 
 window.addEventListener("keydown", keyDownEvent, true)
