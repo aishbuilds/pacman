@@ -22,6 +22,7 @@ var GRID_HEIGHT = 40;
 var grid = [];
 var globalID;
 var dots = [];
+var score = 0;
 
 function init(){
 	
@@ -113,6 +114,9 @@ function drawBorders(){
 			ctx.fillRect(dots[key].x, dots[key].y,5,5);	
 		}		
 	}
+
+	ctx.fillStyle = "#FFFFFF";
+	ctx.fillText("Score: " + score, canvas.width - 80, 20)
 }
 
 function reset(){
@@ -158,6 +162,7 @@ function moveHorizontal(){
 	dotX = pacmanX + (dx * 4)
 	if(dots[dotX + " " + pacmanY]){
 		dots[dotX + " " + pacmanY].eaten = true
+		score += 10;
 	}
 
 	reset();
@@ -204,6 +209,7 @@ function moveVertical(){
 	dotY = pacmanY + (dy * 4)
 	if(dots[pacmanX + " " + dotY]){
 		dots[pacmanX + " " + dotY].eaten = true
+		score += 10;
 	}
 
 	reset();
