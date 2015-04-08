@@ -155,8 +155,9 @@ function moveHorizontal(){
 	
 	pacmanX = pacmanX + (dx * 2)
 
-	if(dots[pacmanX + " " + pacmanY]){
-		dots[pacmanX + " " + pacmanY].eaten = true
+	dotX = pacmanX + (dx * 4)
+	if(dots[dotX + " " + pacmanY]){
+		dots[dotX + " " + pacmanY].eaten = true
 	}
 
 	reset();
@@ -199,8 +200,10 @@ function moveVertical(){
 	}
 
 	pacmanY = pacmanY + (dy * 2)
-	if(dots[pacmanX + " " + pacmanY]){
-		dots[pacmanX + " " + pacmanY].eaten = true
+
+	dotY = pacmanY + (dy * 4)
+	if(dots[pacmanX + " " + dotY]){
+		dots[pacmanX + " " + dotY].eaten = true
 	}
 
 	reset();
