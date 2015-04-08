@@ -21,6 +21,7 @@ var GRID_WIDTH = 40;
 var GRID_HEIGHT = 40;
 var grid = [];
 var globalID;
+var dots = [];
 
 function init(){
 	
@@ -43,7 +44,7 @@ function initializeGrid(){
 
 	grid[0] = zero;
 	
-	// Concate the userGrid to the grid 
+	// Concatenate the userGrid to the grid 
 	for(var i = 0; i<userGrid.length; i++){
 		grid[i+1] = new Array();
 		grid[i+1].push(0);
@@ -77,6 +78,20 @@ function drawBorders(){
 				ctx.lineTo(xPosition+GRID_WIDTH, yPosition+GRID_HEIGHT);
 				ctx.stroke();
 			}
+			if(grid[i][j] == 1){
+				dotX = xPosition + 20;
+				dotY = yPosition + 20;
+				if(!dots[dotX + " " + dotY]){
+					dots[dotX + " " + dotY] = {'x': dotX, 'y': dotY, 'eaten': false}
+				}
+			}
+			
+			// Uncomment to get the coordinates and the value of grid
+			
+			// ctx.font="10px Georgia";
+			// ctx.fillStyle = "#FF0000";
+			// ctx.fillText(xPosition + " " + yPosition, xPosition, yPosition)
+			// ctx.fillText(grid[i][j], xPosition+20, yPosition+20)
 
 			// If the element below is not the same, draw a line below it
 			if(grid[i][j]!= grid[i+1][j]){
@@ -90,6 +105,13 @@ function drawBorders(){
 		}
 		xPosition = 0
 		yPosition += GRID_HEIGHT
+	}
+
+	for(key in dots){
+		if(!dots[key].eaten){
+			ctx.fillStyle = '#FFFFFF';
+			ctx.fillRect(dots[key].x, dots[key].y,5,5);	
+		}		
 	}
 }
 
@@ -130,9 +152,15 @@ function moveHorizontal(){
 		if(diff < 20 || diff > 20)
 			pacmanY = (pacmanY - (pacmanY % GRID_WIDTH)) + 20
 	}
-	reset();
 	
 	pacmanX = pacmanX + (dx * 2)
+
+	if(dots[pacmanX + " " + pacmanY]){
+		dots[pacmanX + " " + pacmanY].eaten = true
+	}
+
+	reset();
+
 	drawPacman(true);
 
 	globalID = window.requestAnimationFrame(moveHorizontal);
@@ -170,9 +198,13 @@ function moveVertical(){
 			pacmanX = (pacmanX - (pacmanX % GRID_WIDTH)) + 20
 	}
 
-	reset();
-	
 	pacmanY = pacmanY + (dy * 2)
+	if(dots[pacmanX + " " + pacmanY]){
+		dots[pacmanX + " " + pacmanY].eaten = true
+	}
+
+	reset();
+
 	drawPacman(false);
 
 	globalID = window.requestAnimationFrame(moveVertical);
