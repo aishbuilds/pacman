@@ -1,7 +1,6 @@
-	console.log("-------")
-	console.log(pacmanX, pacmanY)
-	console.log(currentBlock)
-	console.log(nextBlock)
-	console.log(grid)
-	console.log(xIndex)
-	console.log(yIndex)
+// Uncomment to get the coordinates and the value of grid
+			
+			// ctx.font="10px Georgia";
+			// ctx.fillStyle = "#FF0000";
+			// ctx.fillText(xPosition + " " + yPosition, xPosition, yPosition)
+			// ctx.fillText(grid[i][j], xPosition+20, yPosition+20)

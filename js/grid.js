@@ -86,13 +86,6 @@ function drawBorders(){
 					dots[dotX + " " + dotY] = {'x': dotX, 'y': dotY, 'eaten': false}
 				}
 			}
-			
-			// Uncomment to get the coordinates and the value of grid
-			
-			// ctx.font="10px Georgia";
-			// ctx.fillStyle = "#FF0000";
-			// ctx.fillText(xPosition + " " + yPosition, xPosition, yPosition)
-			// ctx.fillText(grid[i][j], xPosition+20, yPosition+20)
 
 			// If the element below is not the same, draw a line below it
 			if(grid[i][j]!= grid[i+1][j]){
