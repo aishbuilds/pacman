@@ -94,17 +94,10 @@ function drawPacman(ctx, state){
 	ctx.strokeStyle="#000000"
 
 	// Arc of pacman
-	ctx.arc(
-				state.pacmanX, state.pacmanY, config.PACMAN.radius,
-				config.PACMAN[state.pacManDirection].startAngle, 
-				config.PACMAN[state.pacManDirection].endAngle, false
-			)
+	ctx.arc(state.pacmanX, state.pacmanY, config.PACMAN.radius, config.PACMAN[state.pacManDirection].startAngle, config.PACMAN[state.pacManDirection].endAngle, false	)
 	
 	// Mouth
-	ctx.lineTo(
-				state.pacmanX + config.PACMAN[state.pacManDirection].dMouthX,
-				state.pacmanY+ config.PACMAN[state.pacManDirection].dMouthY
-			)
+	ctx.lineTo(state.pacmanX + config.PACMAN[state.pacManDirection].dMouthX, state.pacmanY+ config.PACMAN[state.pacManDirection].dMouthY)
 	
 	ctx.fill();
 	ctx.stroke();
@@ -112,10 +105,6 @@ function drawPacman(ctx, state){
 	// eyes
 	ctx.beginPath();
 	ctx.fillStyle = "#000000"
-	ctx.arc(
-				state.pacmanX + config.PACMAN[state.pacManDirection].dEyesX,
-				state.pacmanY + config.PACMAN[state.pacManDirection].dEyesY,
-				2, 0, Math.PI*2, false
-			)
+	ctx.arc(state.pacmanX + config.PACMAN[state.pacManDirection].dEyesX,	state.pacmanY + config.PACMAN[state.pacManDirection].dEyesY, 2, 0, Math.PI*2, false)
 	ctx.fill();
 }
