@@ -2,7 +2,7 @@ window.onload = init;
 
 function init(){
 	var ctx = initializeCanvas();
-
+	
 	var state = {
 		dots: []
 	}
@@ -42,8 +42,10 @@ function drawBorder(ctx, state){
 			if(config.GRID[i][j]!= config.GRID[i+1][j]){
 				drawLine(ctx, j*config.BOX_WIDTH, i*config.BOX_WIDTH, false)
 			}
-			// Store dots positions
-			storeDotPosition(state, i, j);
+			// Store dots co-ordinates
+			if(config.GRID[i][j] == 1){
+				storeDotPosition(state, i, j)
+			}
 		}
 	}
 }
@@ -65,12 +67,10 @@ function drawLine(ctx, xPosition, yPosition, isVertical){
 }
 
 function storeDotPosition(state, i, j){
-	if(config.GRID[i][j] == 1){
-		dotX = (j*config.BOX_WIDTH) + config.BOX_WIDTH/2
-		dotY = (i*config.BOX_WIDTH) + config.BOX_WIDTH/2
-		if(!state.dots[dotX + " " + dotY]){
-			state.dots[dotX + " " + dotY] = {'x': dotX, 'y': dotY, 'eaten': false}
-		}
+	dotX = (j*config.BOX_WIDTH) + config.BOX_WIDTH/2
+	dotY = (i*config.BOX_WIDTH) + config.BOX_WIDTH/2
+	if(!state.dots[dotX + " " + dotY]){
+		state.dots[dotX + " " + dotY] = {'x': dotX, 'y': dotY, 'eaten': false}
 	}
 }
 
