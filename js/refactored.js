@@ -7,19 +7,24 @@ function init(){
 		dots: [],
 		pacmanX: 60,
 		pacmanY: 60,
+		lastPressedKey: 39,
 		pacManDirection: 'right'
 	}
 
 	window.addEventListener("keydown", function(e){
-		state = update(state, e)
+		state = update(state, e.keyCode)
+		window.requestAnimationFrame(tick);			
 	})
 
 	function tick(){
+		state = update(state, state.lastPressedKey)
 		clear(ctx);
 		draw(ctx, state);
 		window.requestAnimationFrame(tick);
 	}
-	window.requestAnimationFrame(tick);
+	
+	draw(ctx, state);
+	// window.requestAnimationFrame(tick);
 }
 
 function initializeCanvas(){
@@ -113,21 +118,92 @@ function drawPacman(ctx, state){
 	ctx.fill();
 }
 
-function update(state, e){
-	state.pacManDirection = config.KEY_DIRECTIONS[e.keyCode] ? config.KEY_DIRECTIONS[e.keyCode] : state.pacManDirection
+function horizontalAllowed(state, isRight){
+	var xIndex = Math.floor(state.pacmanX/config.BOX_WIDTH);
+	var yIndex = Math.floor(state.pacmanY/config.BOX_WIDTH);
+
+	if(isRight){
+		dx = 1
+		currentBlock = config.GRID[yIndex][xIndex]
+		nextBlock = config.GRID[yIndex][xIndex+1]
+		diagonalbelow = config.GRID[yIndex + 1][xIndex + 1]
+		diagonalabove = config.GRID[yIndex - 1][xIndex + 1]
+	}
+	else{
+		dx = -1
+		currentBlock = config.GRID[yIndex][xIndex]
+		nextBlock = config.GRID[yIndex][xIndex-1]
+		diagonalbelow = config.GRID[yIndex + 1][xIndex - 1]
+		diagonalabove = config.GRID[yIndex - 1][xIndex - 1]
+	}
+		
+	// Stop if a wall is encountered	
+	if((currentBlock != nextBlock) && ((state.pacmanX + (dx * config.PACMAN.radius)) % config.BOX_WIDTH == 0)){
+		return false;
+	}
+
+	if(currentBlock != diagonalbelow || currentBlock != diagonalabove){
+		diff = state.pacmanY % config.BOX_WIDTH
+		if(diff < 20 || diff > 20)
+			state.pacmanY = (state.pacmanY - (state.pacmanY % config.BOX_WIDTH)) + 20
+	}
+	return true
+}
+
+function verticalAllowed(state, isDown){
+	var xIndex = Math.floor(state.pacmanX/config.BOX_WIDTH);
+	var yIndex = Math.floor(state.pacmanY/config.BOX_WIDTH);
+
+	if(isDown){
+		dy = 1
+		currentBlock = config.GRID[yIndex][xIndex]
+		nextBlock = config.GRID[yIndex+1][xIndex]
+		diagonalLeft = config.GRID[yIndex + 1][xIndex - 1]
+		diagonalRight = config.GRID[yIndex + 1][xIndex + 1]
+	}
+	else{
+		dy = -1
+		currentBlock = config.GRID[yIndex][xIndex]
+		nextBlock = config.GRID[yIndex-1][xIndex]
+		diagonalLeft = config.GRID[yIndex - 1][xIndex - 1]
+		diagonalRight = config.GRID[yIndex - 1][xIndex + 1]
+	}
+		
+	// Stop if a wall is encountered	
+	if((currentBlock != nextBlock) && ((state.pacmanY + (dy * config.PACMAN.radius)) % config.BOX_WIDTH == 0)){
+		return false;
+	}
+
+	if((currentBlock != diagonalLeft || currentBlock != diagonalRight)){
+		diff = state.pacmanX % config.BOX_WIDTH
+		if(diff < 20 || diff > 20)
+			state.pacmanX = (state.pacmanX - (state.pacmanX % config.BOX_WIDTH)) + 20
+	}
+	return true
+}
+
+function update(state, keyCode){
+	
+	state.lastPressedKey = keyCode
+	
+	state.pacManDirection = config.KEY_DIRECTIONS[keyCode] ? config.KEY_DIRECTIONS[keyCode] : state.pacManDirection
 	
 	switch(state.pacManDirection){
 		case 'right':
-			state.pacmanX += 2
+			if(horizontalAllowed(state, true))
+				state.pacmanX += 2
 			break;
 		case 'left':
-			state.pacmanX -= 2
+			if(horizontalAllowed(state, false))
+				state.pacmanX -= 2
 			break;
 		case 'up':
-			state.pacmanY -= 2
+			if(verticalAllowed(state, false))
+				state.pacmanY -= 2
 			break;
 		case 'down':
-			state.pacmanY += 2
+			if(verticalAllowed(state, true))
+				state.pacmanY += 2
 			break;
 	}
 
