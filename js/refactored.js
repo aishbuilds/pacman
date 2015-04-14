@@ -2,9 +2,12 @@ window.onload = init;
 
 function init(){
 	var ctx = initializeCanvas();
-	
+
 	var state = {
-		dots: []
+		dots: [],
+		pacmanX: 60,
+		pacmanY: 60,
+		pacManDirection: 'right'
 	}
 
 	function tick(){
@@ -28,7 +31,8 @@ function clear(ctx){
 
 function draw(ctx, state){
 	drawBorder(ctx, state);
-	drawDots(ctx, state)
+	drawDots(ctx, state);
+	drawPacman(ctx, state);
 }
 
 function drawBorder(ctx, state){
@@ -81,4 +85,37 @@ function drawDots(ctx, state){
 			ctx.fillRect(state.dots[key].x, state.dots[key].y,5,5);	
 		}		
 	}
+}
+
+function drawPacman(ctx, state){
+	// Draw the Pacman
+	ctx.beginPath();
+	ctx.fillStyle = "#f2f000"
+	ctx.strokeStyle="#000000"
+
+	// Arc of pacman
+	ctx.arc(
+				state.pacmanX, state.pacmanY, config.PACMAN.radius,
+				config.PACMAN[state.pacManDirection].startAngle, 
+				config.PACMAN[state.pacManDirection].endAngle, false
+			)
+	
+	// Mouth
+	ctx.lineTo(
+				state.pacmanX + config.PACMAN[state.pacManDirection].dMouthX,
+				state.pacmanY+ config.PACMAN[state.pacManDirection].dMouthY
+			)
+	
+	ctx.fill();
+	ctx.stroke();
+	
+	// eyes
+	ctx.beginPath();
+	ctx.fillStyle = "#000000"
+	ctx.arc(
+				state.pacmanX + config.PACMAN[state.pacManDirection].dEyesX,
+				state.pacmanY + config.PACMAN[state.pacManDirection].dEyesY,
+				2, 0, Math.PI*2, false
+			)
+	ctx.fill();
 }
