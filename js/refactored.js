@@ -10,10 +10,14 @@ function init(){
 		pacManDirection: 'right'
 	}
 
+	window.addEventListener("keydown", function(e){
+		state = update(state, e)
+	})
+
 	function tick(){
 		clear(ctx);
 		draw(ctx, state);
-		// window.requestAnimationFrame(tick);
+		window.requestAnimationFrame(tick);
 	}
 	window.requestAnimationFrame(tick);
 }
@@ -107,4 +111,25 @@ function drawPacman(ctx, state){
 	ctx.fillStyle = "#000000"
 	ctx.arc(state.pacmanX + config.PACMAN[state.pacManDirection].dEyesX,	state.pacmanY + config.PACMAN[state.pacManDirection].dEyesY, 2, 0, Math.PI*2, false)
 	ctx.fill();
+}
+
+function update(state, e){
+	state.pacManDirection = config.KEY_DIRECTIONS[e.keyCode] ? config.KEY_DIRECTIONS[e.keyCode] : state.pacManDirection
+	
+	switch(state.pacManDirection){
+		case 'right':
+			state.pacmanX += 2
+			break;
+		case 'left':
+			state.pacmanX -= 2
+			break;
+		case 'up':
+			state.pacmanY -= 2
+			break;
+		case 'down':
+			state.pacmanY += 2
+			break;
+	}
+
+	return state;
 }

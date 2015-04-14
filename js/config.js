@@ -48,5 +48,11 @@ var config = {
 			dEyesX: -8,
 			dEyesY: -2
 		}
+	},
+	KEY_DIRECTIONS:{
+		37: 'left',
+		38: 'up',
+		39: 'right',
+		40: 'down'
 	}
 }
