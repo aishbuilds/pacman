@@ -2,13 +2,14 @@ window.onload = init;
 
 function init(){
 	var ctx = initializeCanvas();
+
 	var state = {
 		dots: []
 	}
 
 	function tick(){
 		clear(ctx);
-		draw(ctx);
+		draw(ctx, state);
 		// window.requestAnimationFrame(tick);
 	}
 	window.requestAnimationFrame(tick);
@@ -25,11 +26,12 @@ function clear(ctx){
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
-function draw(ctx){
-	drawBorder(ctx);
+function draw(ctx, state){
+	drawBorder(ctx, state);
+	drawDots(ctx, state)
 }
 
-function drawBorder(ctx){
+function drawBorder(ctx, state){
 	for(var i=0; i<config.GRID.length-1; i++){
 		for(var j=0; j<config.GRID[i].length-1; j++){
 			// If the element to the right is not the same, draw a line to the right
@@ -40,6 +42,8 @@ function drawBorder(ctx){
 			if(config.GRID[i][j]!= config.GRID[i+1][j]){
 				drawLine(ctx, j*config.BOX_WIDTH, i*config.BOX_WIDTH, false)
 			}
+			// Store dots positions
+			storeDotPosition(state, i, j);
 		}
 	}
 }
@@ -58,4 +62,23 @@ function drawLine(ctx, xPosition, yPosition, isVertical){
 	}
 
 	ctx.stroke();
+}
+
+function storeDotPosition(state, i, j){
+	if(config.GRID[i][j] == 1){
+		dotX = (j*config.BOX_WIDTH) + config.BOX_WIDTH/2
+		dotY = (i*config.BOX_WIDTH) + config.BOX_WIDTH/2
+		if(!state.dots[dotX + " " + dotY]){
+			state.dots[dotX + " " + dotY] = {'x': dotX, 'y': dotY, 'eaten': false}
+		}
+	}
+}
+
+function drawDots(ctx, state){
+	for(key in state.dots){
+		if(!state.dots[key].eaten){
+			ctx.fillStyle = '#FFFFFF';
+			ctx.fillRect(state.dots[key].x, state.dots[key].y,5,5);	
+		}		
+	}
 }
