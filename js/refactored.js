@@ -167,12 +167,7 @@ function horizontalAllowed(state, isRight){
 		return false
 
 	// Adjust pacman
-	if(currentBlock != diagonalbelow || currentBlock != diagonalabove){
-		diff = state.pacmanY % config.BOX_WIDTH
-		if(diff < 20 || diff > 20)
-			state.pacmanY = (state.pacmanY - (state.pacmanY % config.BOX_WIDTH)) + 20
-	}
-	
+	adjustPacman(currentBlock, diagonalbelow, diagonalabove, state, 'pacmanY')
 	return state
 }
 
@@ -197,17 +192,22 @@ function verticalAllowed(state, isDown){
 	if(!checkWall(currentBlock, nextBlock, state.pacmanY, dy))
 		return false
 
-	if((currentBlock != diagonalLeft || currentBlock != diagonalRight)){
-		diff = state.pacmanX % config.BOX_WIDTH
-		if(diff < 20 || diff > 20)
-			state.pacmanX = (state.pacmanX - (state.pacmanX % config.BOX_WIDTH)) + 20
-	}
+	adjustPacman(currentBlock, diagonalLeft, diagonalRight, state, 'pacmanX')
 	return true
 }
+
 
 function checkWall(currentBlock, nextBlock, position, diff){
 	if((currentBlock != nextBlock) && ((position + (diff * config.PACMAN.radius)) % config.BOX_WIDTH == 0)){
 		return false;
 	}
 	return true
+}
+
+function adjustPacman(currentBlock, diagonalLeft, diagonalRight, state, position){
+	if((currentBlock != diagonalLeft || currentBlock != diagonalRight)){
+		diff = state[position] % config.BOX_WIDTH
+		if(diff < 20 || diff > 20)
+			state[position] = (state[position] - (state[position] % config.BOX_WIDTH)) + 20
+	}
 }
