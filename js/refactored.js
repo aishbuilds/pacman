@@ -45,11 +45,7 @@ function update(state, keyCode){
 }
 
 function updatePacmanPosition(state){
-	var diff;
-	if(state.pacManDirection == 'right' || state.pacManDirection == 'down')
-		diff = 2
-	else
-		diff = -2
+	var diff = state.pacManDirection == 'right' || state.pacManDirection == 'down' ? 2 : -2
 
 	if(state.pacManDirection == 'right' || state.pacManDirection == 'left'){
 		if(moveAllowed(state, 'pacmanX', 'pacmanY')){
