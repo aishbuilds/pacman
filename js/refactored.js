@@ -47,23 +47,47 @@ function update(state, keyCode){
 function updatePacmanPosition(state){
 	switch(state.pacManDirection){
 		case 'right':
-			if(moveAllowed(state, 'pacmanX', 'pacmanY'))
+			if(moveAllowed(state, 'pacmanX', 'pacmanY')){
 				state.pacmanX += 2
+				eatDots(state, false, 1)
+			}				
 			break;
 		case 'left':
-			if(moveAllowed(state, 'pacmanX', 'pacmanY'))
+			if(moveAllowed(state, 'pacmanX', 'pacmanY')){
 				state.pacmanX -= 2
+				eatDots(state, false, -1)
+			}				
 			break;
 		case 'up':
-			if(moveAllowed(state, 'pacmanY', 'pacmanX'))
+			if(moveAllowed(state, 'pacmanY', 'pacmanX')){
 				state.pacmanY -= 2
+				eatDots(state, true, -1)
+			}				
 			break;
 		case 'down':
-			if(moveAllowed(state, 'pacmanY', 'pacmanX'))
+			if(moveAllowed(state, 'pacmanY', 'pacmanX')){
 				state.pacmanY += 2
+				eatDots(state, true, 1)
+			}				
 			break;
 	}
+
 	return state;
+}
+
+function eatDots(state, isVertical, diff){
+	if(isVertical){
+		dotY = state.pacmanY + (diff * 4)
+		key = state.dots[state.pacmanX + " " + dotY]
+	}
+	else{
+		dotX = state.pacmanX + (diff * 4)
+		key = state.dots[dotX + " " + state.pacmanY]
+	}
+	
+	if(key){
+		key.eaten = true
+	}
 }
 
 function draw(ctx, state){
