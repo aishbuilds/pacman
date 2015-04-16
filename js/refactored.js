@@ -47,19 +47,19 @@ function update(state, keyCode){
 function updatePacmanPosition(state){
 	switch(state.pacManDirection){
 		case 'right':
-			if(horizontalAllowed(state, true))
+			if(moveAllowed(state, 'pacmanX', 'pacmanY'))
 				state.pacmanX += 2
 			break;
 		case 'left':
-			if(horizontalAllowed(state, false))
+			if(moveAllowed(state, 'pacmanX', 'pacmanY'))
 				state.pacmanX -= 2
 			break;
 		case 'up':
-			if(verticalAllowed(state, false))
+			if(moveAllowed(state, 'pacmanY', 'pacmanX'))
 				state.pacmanY -= 2
 			break;
 		case 'down':
-			if(verticalAllowed(state, true))
+			if(moveAllowed(state, 'pacmanY', 'pacmanX'))
 				state.pacmanY += 2
 			break;
 	}
@@ -145,67 +145,65 @@ function drawPacman(ctx, state){
 	ctx.fill();
 }
 
-function horizontalAllowed(state, isRight){
-	var xIndex = Math.floor(state.pacmanX/config.BOX_WIDTH);
-	var yIndex = Math.floor(state.pacmanY/config.BOX_WIDTH);
+function moveAllowed(state, wallPosition, adjustPosition){
+	neighbors = getNeighbors(state);
 
-	if(isRight){
-		dx = 1
-		diagonalbelow = config.GRID[yIndex + 1][xIndex + 1]
-		diagonalabove = config.GRID[yIndex - 1][xIndex + 1]
-	}
-	else{
-		dx = -1
-		diagonalbelow = config.GRID[yIndex + 1][xIndex - 1]
-		diagonalabove = config.GRID[yIndex - 1][xIndex - 1]
-	}
-	currentBlock = config.GRID[yIndex][xIndex]
-	nextBlock = config.GRID[yIndex][xIndex+dx]	
-
-	// Stop if a wall is encountered	
-	if(!checkWall(currentBlock, nextBlock, state.pacmanX, dx))
+	// Stop if a wall is encountered
+	if(!checkWall(neighbors, state[wallPosition], neighbors.diff))
 		return false
 
 	// Adjust pacman
-	adjustPacman(currentBlock, diagonalbelow, diagonalabove, state, 'pacmanY')
-	return state
-}
-
-function verticalAllowed(state, isDown){
-	var xIndex = Math.floor(state.pacmanX/config.BOX_WIDTH);
-	var yIndex = Math.floor(state.pacmanY/config.BOX_WIDTH);
-
-	if(isDown){
-		dy = 1
-		diagonalLeft = config.GRID[yIndex + 1][xIndex - 1]
-		diagonalRight = config.GRID[yIndex + 1][xIndex + 1]
-	}
-	else{
-		dy = -1
-		diagonalLeft = config.GRID[yIndex - 1][xIndex - 1]
-		diagonalRight = config.GRID[yIndex - 1][xIndex + 1]
-	}
-	currentBlock = config.GRID[yIndex][xIndex]
-	nextBlock = config.GRID[yIndex+dy][xIndex]
-		
-	// Stop if a wall is encountered	
-	if(!checkWall(currentBlock, nextBlock, state.pacmanY, dy))
-		return false
-
-	adjustPacman(currentBlock, diagonalLeft, diagonalRight, state, 'pacmanX')
+	adjustPacman(neighbors, state, adjustPosition)
 	return true
 }
 
+function getNeighbors(state){
+	var xIndex = Math.floor(state.pacmanX/config.BOX_WIDTH);
+	var yIndex = Math.floor(state.pacmanY/config.BOX_WIDTH);
+	neighbors = {}
 
-function checkWall(currentBlock, nextBlock, position, diff){
-	if((currentBlock != nextBlock) && ((position + (diff * config.PACMAN.radius)) % config.BOX_WIDTH == 0)){
+	switch(state.pacManDirection){
+		case 'right':
+			neighbors.diff = 1
+			neighbors.diagonal1 = config.GRID[yIndex + 1][xIndex + 1] //diagonal below
+			neighbors.diagonal1 = config.GRID[yIndex - 1][xIndex + 1] //diagonal above
+			break;
+		case 'left':
+			neighbors.diff = -1
+			neighbors.diagonal1 = config.GRID[yIndex + 1][xIndex - 1] //diagonal below
+			neighbors.diagonal2 = config.GRID[yIndex - 1][xIndex - 1] //diagonal above
+			break;
+		case 'down':
+			neighbors.diff = 1
+			neighbors.diagonal1 = config.GRID[yIndex + 1][xIndex - 1] //diagonal Left
+			neighbors.diagonal2 = config.GRID[yIndex + 1][xIndex + 1] //diagonal Right
+			break;
+		case 'up':
+			neighbors.diff = -1
+			neighbors.diagonal1 = config.GRID[yIndex - 1][xIndex - 1] //diagonal Left
+			neighbors.diagonal2 = config.GRID[yIndex - 1][xIndex + 1] //diagonal Right
+			break;
+	}
+
+	if(state.pacManDirection == 'right' || state.pacManDirection == 'left')
+		neighbors.nextBlock = config.GRID[yIndex][xIndex+neighbors.diff]	
+	else
+		neighbors.nextBlock = config.GRID[yIndex+neighbors.diff][xIndex]	
+
+	neighbors.currentBlock = config.GRID[yIndex][xIndex]
+	
+	return neighbors
+}
+
+function checkWall(neighbors, position, diff){
+	if((neighbors.currentBlock != neighbors.nextBlock) && ((position + (diff * config.PACMAN.radius)) % config.BOX_WIDTH == 0)){
 		return false;
 	}
 	return true
 }
 
-function adjustPacman(currentBlock, diagonalLeft, diagonalRight, state, position){
-	if((currentBlock != diagonalLeft || currentBlock != diagonalRight)){
+function adjustPacman(neighbors, state, position){
+	if((neighbors.currentBlock != neighbors.diagonal1 || neighbors.currentBlock != neighbors.diagonal2)){
 		diff = state[position] % config.BOX_WIDTH
 		if(diff < 20 || diff > 20)
 			state[position] = (state[position] - (state[position] % config.BOX_WIDTH)) + 20
