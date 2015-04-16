@@ -4,16 +4,15 @@ function init(){
 	var ctx = initializeCanvas();
 
 	var state = {
-		dots: [],
 		pacmanX: 60,
 		pacmanY: 60,
-		lastPressedKey: 39,
-		pacManDirection: 'right'
+		lastPressedKey: 37,
+		pacManDirection: 'left',
+		dots: []
 	}
 
 	window.addEventListener("keydown", function(e){
 		state = update(state, e.keyCode)
-		window.requestAnimationFrame(tick);			
 	})
 
 	function tick(){
@@ -22,9 +21,9 @@ function init(){
 		draw(ctx, state);
 		window.requestAnimationFrame(tick);
 	}
+
+	window.requestAnimationFrame(tick);
 	
-	draw(ctx, state);
-	// window.requestAnimationFrame(tick);
 }
 
 function initializeCanvas(){
@@ -36,6 +35,35 @@ function initializeCanvas(){
 
 function clear(ctx){
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+
+function update(state, keyCode){	
+	state.lastPressedKey = keyCode
+	state.pacManDirection = config.KEY_DIRECTIONS[keyCode] ? config.KEY_DIRECTIONS[keyCode] : state.pacManDirection
+	state = updatePacmanPosition(state)
+	return state;
+}
+
+function updatePacmanPosition(state){
+	switch(state.pacManDirection){
+		case 'right':
+			if(horizontalAllowed(state, true))
+				state.pacmanX += 2
+			break;
+		case 'left':
+			if(horizontalAllowed(state, false))
+				state.pacmanX -= 2
+			break;
+		case 'up':
+			if(verticalAllowed(state, false))
+				state.pacmanY -= 2
+			break;
+		case 'down':
+			if(verticalAllowed(state, true))
+				state.pacmanY += 2
+			break;
+	}
+	return state;
 }
 
 function draw(ctx, state){
@@ -97,7 +125,6 @@ function drawDots(ctx, state){
 }
 
 function drawPacman(ctx, state){
-	// Draw the Pacman
 	ctx.beginPath();
 	ctx.fillStyle = "#f2f000"
 	ctx.strokeStyle="#000000"
@@ -124,30 +151,29 @@ function horizontalAllowed(state, isRight){
 
 	if(isRight){
 		dx = 1
-		currentBlock = config.GRID[yIndex][xIndex]
-		nextBlock = config.GRID[yIndex][xIndex+1]
 		diagonalbelow = config.GRID[yIndex + 1][xIndex + 1]
 		diagonalabove = config.GRID[yIndex - 1][xIndex + 1]
 	}
 	else{
 		dx = -1
-		currentBlock = config.GRID[yIndex][xIndex]
-		nextBlock = config.GRID[yIndex][xIndex-1]
 		diagonalbelow = config.GRID[yIndex + 1][xIndex - 1]
 		diagonalabove = config.GRID[yIndex - 1][xIndex - 1]
 	}
-		
-	// Stop if a wall is encountered	
-	if((currentBlock != nextBlock) && ((state.pacmanX + (dx * config.PACMAN.radius)) % config.BOX_WIDTH == 0)){
-		return false;
-	}
+	currentBlock = config.GRID[yIndex][xIndex]
+	nextBlock = config.GRID[yIndex][xIndex+dx]	
 
+	// Stop if a wall is encountered	
+	if(!checkWall(currentBlock, nextBlock, state.pacmanX, dx))
+		return false
+
+	// Adjust pacman
 	if(currentBlock != diagonalbelow || currentBlock != diagonalabove){
 		diff = state.pacmanY % config.BOX_WIDTH
 		if(diff < 20 || diff > 20)
 			state.pacmanY = (state.pacmanY - (state.pacmanY % config.BOX_WIDTH)) + 20
 	}
-	return true
+	
+	return state
 }
 
 function verticalAllowed(state, isDown){
@@ -156,23 +182,20 @@ function verticalAllowed(state, isDown){
 
 	if(isDown){
 		dy = 1
-		currentBlock = config.GRID[yIndex][xIndex]
-		nextBlock = config.GRID[yIndex+1][xIndex]
 		diagonalLeft = config.GRID[yIndex + 1][xIndex - 1]
 		diagonalRight = config.GRID[yIndex + 1][xIndex + 1]
 	}
 	else{
 		dy = -1
-		currentBlock = config.GRID[yIndex][xIndex]
-		nextBlock = config.GRID[yIndex-1][xIndex]
 		diagonalLeft = config.GRID[yIndex - 1][xIndex - 1]
 		diagonalRight = config.GRID[yIndex - 1][xIndex + 1]
 	}
+	currentBlock = config.GRID[yIndex][xIndex]
+	nextBlock = config.GRID[yIndex+dy][xIndex]
 		
 	// Stop if a wall is encountered	
-	if((currentBlock != nextBlock) && ((state.pacmanY + (dy * config.PACMAN.radius)) % config.BOX_WIDTH == 0)){
-		return false;
-	}
+	if(!checkWall(currentBlock, nextBlock, state.pacmanY, dy))
+		return false
 
 	if((currentBlock != diagonalLeft || currentBlock != diagonalRight)){
 		diff = state.pacmanX % config.BOX_WIDTH
@@ -182,30 +205,9 @@ function verticalAllowed(state, isDown){
 	return true
 }
 
-function update(state, keyCode){
-	
-	state.lastPressedKey = keyCode
-	
-	state.pacManDirection = config.KEY_DIRECTIONS[keyCode] ? config.KEY_DIRECTIONS[keyCode] : state.pacManDirection
-	
-	switch(state.pacManDirection){
-		case 'right':
-			if(horizontalAllowed(state, true))
-				state.pacmanX += 2
-			break;
-		case 'left':
-			if(horizontalAllowed(state, false))
-				state.pacmanX -= 2
-			break;
-		case 'up':
-			if(verticalAllowed(state, false))
-				state.pacmanY -= 2
-			break;
-		case 'down':
-			if(verticalAllowed(state, true))
-				state.pacmanY += 2
-			break;
+function checkWall(currentBlock, nextBlock, position, diff){
+	if((currentBlock != nextBlock) && ((position + (diff * config.PACMAN.radius)) % config.BOX_WIDTH == 0)){
+		return false;
 	}
-
-	return state;
+	return true
 }
