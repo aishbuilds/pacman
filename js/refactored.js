@@ -37,29 +37,35 @@ function clear(ctx){
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
-function update(state, keyCode){	
-	state.lastPressedKey = keyCode
-	state.pacManDirection = config.KEY_DIRECTIONS[keyCode] ? config.KEY_DIRECTIONS[keyCode] : state.pacManDirection
-	state = updatePacmanPosition(state)
+function update(state, keyCode){
+	state = updatePacmanPosition(state, keyCode, config.KEY_DIRECTIONS[keyCode])
 	return state;
 }
 
-function updatePacmanPosition(state){
-	var diff = state.pacManDirection == 'right' || state.pacManDirection == 'down' ? 2 : -2
+function updatePacmanPosition(state, keyCode, direction){
+	var diff = direction == 'right' || direction == 'down' ? 2 : -2
 
-	if(state.pacManDirection == 'right' || state.pacManDirection == 'left'){
-		if(moveAllowed(state, 'pacmanX', 'pacmanY')){
+	if(direction == 'right' || direction == 'left'){
+		if(moveAllowed(state, 'pacmanX', 'pacmanY', direction)){
 			state.pacmanX += diff
 			eatDots(state, false, diff)
+			state = updatePacmanDirection(state, keyCode, direction);
 		}
 	}
 	else{
-		if(moveAllowed(state, 'pacmanY', 'pacmanX')){
+		if(moveAllowed(state, 'pacmanY', 'pacmanX', direction)){
 			state.pacmanY += diff
 			eatDots(state, true, diff)
-		}				
+			state = updatePacmanDirection(state, keyCode, direction);
+		}
 	}
 	return state;
+}
+
+function updatePacmanDirection(state, keyCode, direction){
+	state.lastPressedKey = keyCode
+	state.pacManDirection = direction
+	return state
 }
 
 function draw(ctx, state){
@@ -156,8 +162,8 @@ function eatDots(state, isVertical, diff){
 	}
 }
 
-function moveAllowed(state, wallPosition, adjustPosition){
-	neighbors = getNeighbors(state);
+function moveAllowed(state, wallPosition, adjustPosition, direction){
+	neighbors = getNeighbors(state, direction);
 
 	// Stop if a wall is encountered
 	if(!checkWall(neighbors, state[wallPosition], neighbors.diff))
@@ -168,12 +174,12 @@ function moveAllowed(state, wallPosition, adjustPosition){
 	return true
 }
 
-function getNeighbors(state){
+function getNeighbors(state, direction){
 	var xIndex = Math.floor(state.pacmanX/config.BOX_WIDTH);
 	var yIndex = Math.floor(state.pacmanY/config.BOX_WIDTH);
 	neighbors = {}
 
-	switch(state.pacManDirection){
+	switch(direction){
 		case 'right':
 			neighbors.diff = 1
 			neighbors.diagonal1 = config.GRID[yIndex + 1][xIndex + 1] //diagonal below
@@ -196,7 +202,7 @@ function getNeighbors(state){
 			break;
 	}
 
-	if(state.pacManDirection == 'right' || state.pacManDirection == 'left')
+	if(direction == 'right' || direction == 'left')
 		neighbors.nextBlock = config.GRID[yIndex][xIndex+neighbors.diff]	
 	else
 		neighbors.nextBlock = config.GRID[yIndex+neighbors.diff][xIndex]	
