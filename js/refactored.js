@@ -62,21 +62,6 @@ function updatePacmanPosition(state){
 	return state;
 }
 
-function eatDots(state, isVertical, diff){
-	if(isVertical){
-		dotY = state.pacmanY + (diff * 4)
-		key = state.dots[state.pacmanX + " " + dotY]
-	}
-	else{
-		dotX = state.pacmanX + (diff * 4)
-		key = state.dots[dotX + " " + state.pacmanY]
-	}
-	
-	if(key){
-		key.eaten = true
-	}
-}
-
 function draw(ctx, state){
 	drawBorder(ctx, state);
 	drawDots(ctx, state);
@@ -154,6 +139,21 @@ function drawPacman(ctx, state){
 	ctx.fillStyle = "#000000"
 	ctx.arc(state.pacmanX + config.PACMAN[state.pacManDirection].dEyesX,	state.pacmanY + config.PACMAN[state.pacManDirection].dEyesY, 2, 0, Math.PI*2, false)
 	ctx.fill();
+}
+
+function eatDots(state, isVertical, diff){
+	if(isVertical){
+		dotY = state.pacmanY + (diff * 4)
+		key = state.dots[state.pacmanX + " " + dotY]
+	}
+	else{
+		dotX = state.pacmanX + (diff * 4)
+		key = state.dots[dotX + " " + state.pacmanY]
+	}
+	
+	if(key){
+		key.eaten = true
+	}
 }
 
 function moveAllowed(state, wallPosition, adjustPosition){
